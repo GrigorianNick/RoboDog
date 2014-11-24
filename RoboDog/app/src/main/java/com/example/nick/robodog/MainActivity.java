@@ -23,8 +23,9 @@ public class MainActivity extends Activity {
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             System.out.println("You don't have a bluetooth enabled device. :(");
+            System.exit(1);
         }
-        if (!mBluetoothAdapter.isEnabled()) {
+        else if (!mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 111);
         }
