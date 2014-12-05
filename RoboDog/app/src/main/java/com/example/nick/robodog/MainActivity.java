@@ -1,8 +1,11 @@
 package com.example.nick.robodog;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +20,7 @@ public class MainActivity extends Activity {
         System.out.println("creating");
     }
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStart() {
         super.onStart(); // Voodoo. Do not delete.d
@@ -29,6 +33,15 @@ public class MainActivity extends Activity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 111);
         }
+        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("00:16:53:05:E2:1A");
+        System.out.println("=============");
+        System.out.println(device.getBondState());
+        System.out.println(BluetoothDevice.BOND_BONDED);
+        System.out.println(BluetoothDevice.BOND_NONE);
+        System.out.println(BluetoothDevice.BOND_BONDING);
+        System.out.println("=============");
+        //device.createBond();
+        //System.out.println(device.getAddress());
     }
 
     @Override
