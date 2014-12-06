@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
@@ -58,9 +59,32 @@ public class MainActivity extends Activity {
             BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
             socket.connect();
             OutputStream outputStream = socket.getOutputStream();
+            InputStream inputStream = socket.getInputStream();
             String message = "cry";
-            byte[] byte_message = message.getBytes();
+            byte[] mess = message.getBytes();
+            for (int a = 0; a < mess.length; a++) {
+                System.out.println(mess[a]);
+            }
+            //byte[] byte_message = message.getBytes();
+            //byte[] byte_message = new byte[]{(byte) 0x80, (byte) 0x09, (byte) 0x00, (byte) 0x03, (byte) 0x01, (byte) 0x0};
+            //byte[] byte_message = new byte[] {(byte)0x06, (byte)0x00, (byte)0x80, (byte)0x03, (byte)0x0B, (byte)0x02, (byte)0xF4, (byte)0x01};
+            //while (true) {
+            //byte[] byte_message = new byte[] {(byte)0x0C, (byte)0x00, (byte) 0x80, (byte) 0x04, (byte) 0x02, (byte) 0x64, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0x20, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
+            byte[] byte_message = new byte[] {(byte)0x08, (byte)0x00, (byte)0x80, (byte)0x09, (byte) 0x00, (byte)0x04, (byte) 99, (byte)114, (byte)121, (byte)0x00};
             outputStream.write(byte_message);
+            //byte[] byte_message = new byte[] {(byte)0x06, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x0B, (byte)0x02, (byte)0xF4, (byte)0x01};
+            //byte[] byte_message = new byte[] { (byte) 0x??, (byte) 0x??, (byte) 0x00}
+            //byte[] byte_message = new byte[] { (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0x01};
+            //outputStream.write(byte_message);
+            /*byte[] byte_message2 = new byte[] {(byte) 0x5, (byte)0x00, (byte)0x00, (byte)0x13, (byte)0x00, (byte)0x00, (byte)0x00};
+            outputStream.write(byte_message2);
+            System.out.println("+++++++++++++++++");
+            for (int i = 0; i < 10; i++) {
+                System.out.println(inputStream.read());
+            }
+            System.out.println("+++++++++++++++++");*/
+            //System.exit(0);
+            //}
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
