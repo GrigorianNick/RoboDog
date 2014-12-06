@@ -4,11 +4,17 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelUuid;
+import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.OutputStream;
+import java.util.UUID;
 
 
 public class MainActivity extends Activity {
@@ -40,8 +46,26 @@ public class MainActivity extends Activity {
         System.out.println(BluetoothDevice.BOND_NONE);
         System.out.println(BluetoothDevice.BOND_BONDING);
         System.out.println("=============");
-        //device.createBond();
-        //System.out.println(device.getAddress());
+        System.out.println(device.getBondState());
+        System.out.println(BluetoothDevice.BOND_BONDED);
+        System.out.println(BluetoothDevice.BOND_NONE);
+        device.createBond();
+        System.out.println(device.getAddress());
+        System.out.println("=============");
+
+        ParcelUuid uuid = device.getUuids()[0];
+        try {
+            BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
+            socket.connect();
+            OutputStream outputStream = socket.getOutputStream();
+            String message = "cry";
+            byte[] byte_message = message.getBytes();
+            outputStream.write(byte_message);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @Override
