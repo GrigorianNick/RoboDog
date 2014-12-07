@@ -12,14 +12,11 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
-import android.os.Parcelable;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Timer;
-import java.util.UUID;
 
 
 public class MainActivity extends Activity {
@@ -28,28 +25,21 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        System.out.println("creating");
     }
 
     BluetoothAdapter mBluetoothAdapter;
 
-    // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            // When discovery finds a device
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getAddress().equals("00:16:53:05:E2:1A")) {
-                    //System.out.println("///////////////////\nFOUND IT!\n///////////////////\n");
                     short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
                     System.out.println(rssi);
-                    System.out.println(")))))))))))))))))))))))))))))))");
                     mBluetoothAdapter.cancelDiscovery();
                     mBluetoothAdapter.startDiscovery();
                 }
-                // Add the name and address to an array adapter to show in a ListView
             }
         }
     };
@@ -58,10 +48,8 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart(); // Voodoo. Do not delete.
-        // Register the BroadcastReceiver
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
-        //super.onStart(); // Voodoo. Do not delete.
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             System.out.println("You don't have a bluetooth enabled device. :(");
@@ -91,37 +79,13 @@ public class MainActivity extends Activity {
             socket.connect();
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
-            String message = "cry";
-            //byte[] byte_message = message.getBytes();
-            //byte[] byte_message = new byte[]{(byte) 0x80, (byte) 0x09, (byte) 0x00, (byte) 0x03, (byte) 0x01, (byte) 0x0};
-            //byte[] byte_message = new byte[] {(byte)0x06, (byte)0x00, (byte)0x80, (byte)0x03, (byte)0x0B, (byte)0x02, (byte)0xF4, (byte)0x01};
-            //while (true) {
-            //byte[] byte_message = new byte[] {(byte)0x0C, (byte)0x00, (byte) 0x80, (byte) 0x04, (byte) 0x02, (byte) 0x64, (byte) 0x07, (byte) 0x00, (byte) 0x00, (byte) 0x20, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00 };
             byte[] byte_message = new byte[] {(byte)0x08, (byte)0x00, (byte)0x80, (byte)0x09, (byte) 0x00, (byte)0x04, (byte) 99, (byte)114, (byte)121, (byte)0x00};
             outputStream.write(byte_message);
-            //byte[] byte_message = new byte[] {(byte)0x06, (byte)0x00, (byte)0x00, (byte)0x03, (byte)0x0B, (byte)0x02, (byte)0xF4, (byte)0x01};
-            //byte[] byte_message = new byte[] { (byte) 0x??, (byte) 0x??, (byte) 0x00}
-            //byte[] byte_message = new byte[] { (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0x01};
-            //outputStream.write(byte_message);
-            byte[] byte_message2 = new byte[] {(byte) 0x5, (byte)0x00, (byte)0x00, (byte)0x13, (byte)0x00, (byte)0x00, (byte)0x00};
-            outputStream.write(byte_message2);
-            System.out.println("+++++++++++++++++");
-            for (int i = 0; i < 10; i++) {
-                System.out.println(inputStream.read());
-            }
-            System.out.println("+++++++++++++++++");
-            //System.exit(0);
-            //}
-            System.out.println("Starting discovery");
-            //while (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                mBluetoothAdapter.startDiscovery();
-            //}
-            System.out.println("Dont discovering");
+            mBluetoothAdapter.startDiscovery();
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-        //unregisterReceiver(mReceiver);
     }
 
     @Override
