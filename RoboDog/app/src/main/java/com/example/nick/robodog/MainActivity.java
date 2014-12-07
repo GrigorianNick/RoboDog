@@ -30,6 +30,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         System.out.println("creating");
     }
+
+    BluetoothAdapter mBluetoothAdapter;
+
     // Create a BroadcastReceiver for ACTION_FOUND
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
@@ -39,21 +42,27 @@ public class MainActivity extends Activity {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getAddress().equals("00:16:53:05:E2:1A")) {
-                    System.out.println("///////////////////\nFOUND IT!\n///////////////////\n");
+                    //System.out.println("///////////////////\nFOUND IT!\n///////////////////\n");
+                    short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+                    System.out.println(rssi);
+                    System.out.println(")))))))))))))))))))))))))))))))");
+                    mBluetoothAdapter.cancelDiscovery();
+                    mBluetoothAdapter.startDiscovery();
                 }
                 // Add the name and address to an array adapter to show in a ListView
             }
         }
     };
+
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStart() {
-        super.onStart();
+        super.onStart(); // Voodoo. Do not delete.
         // Register the BroadcastReceiver
-        //IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        //registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
-        //super.onStart(); // Voodoo. Do not delete.d
-        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+        //super.onStart(); // Voodoo. Do not delete.
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             System.out.println("You don't have a bluetooth enabled device. :(");
             System.exit(1);
@@ -103,20 +112,21 @@ public class MainActivity extends Activity {
             System.out.println("+++++++++++++++++");
             //System.exit(0);
             //}
-            Intent rssi_intent = new Intent(BluetoothDevice.EXTRA_RSSI);
-            short rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-            System.out.println(rssi);
-            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-            System.out.println(rssi);
-            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-            System.out.println(rssi);
-            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-            System.out.println(rssi);
+            System.out.println("Starting discovery");
+            //while (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+                mBluetoothAdapter.startDiscovery();
+            //}
+            System.out.println("Dont discovering");
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
         //unregisterReceiver(mReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        unregisterReceiver(mReceiver);
     }
 
     @Override
