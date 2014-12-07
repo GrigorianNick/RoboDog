@@ -5,7 +5,10 @@ import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.ParcelUuid;
@@ -15,6 +18,7 @@ import android.view.MenuItem;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Timer;
 import java.util.UUID;
 
 
@@ -26,11 +30,29 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         System.out.println("creating");
     }
-
+    // Create a BroadcastReceiver for ACTION_FOUND
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (device.getAddress().equals("00:16:53:05:E2:1A")) {
+                    System.out.println("///////////////////\nFOUND IT!\n///////////////////\n");
+                }
+                // Add the name and address to an array adapter to show in a ListView
+            }
+        }
+    };
     @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onStart() {
-        super.onStart(); // Voodoo. Do not delete.d
+        super.onStart();
+        // Register the BroadcastReceiver
+        //IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        //registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+        //super.onStart(); // Voodoo. Do not delete.d
         BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBluetoothAdapter == null) {
             System.out.println("You don't have a bluetooth enabled device. :(");
@@ -61,10 +83,6 @@ public class MainActivity extends Activity {
             OutputStream outputStream = socket.getOutputStream();
             InputStream inputStream = socket.getInputStream();
             String message = "cry";
-            byte[] mess = message.getBytes();
-            for (int a = 0; a < mess.length; a++) {
-                System.out.println(mess[a]);
-            }
             //byte[] byte_message = message.getBytes();
             //byte[] byte_message = new byte[]{(byte) 0x80, (byte) 0x09, (byte) 0x00, (byte) 0x03, (byte) 0x01, (byte) 0x0};
             //byte[] byte_message = new byte[] {(byte)0x06, (byte)0x00, (byte)0x80, (byte)0x03, (byte)0x0B, (byte)0x02, (byte)0xF4, (byte)0x01};
@@ -76,20 +94,29 @@ public class MainActivity extends Activity {
             //byte[] byte_message = new byte[] { (byte) 0x??, (byte) 0x??, (byte) 0x00}
             //byte[] byte_message = new byte[] { (byte) 0x02, (byte) 0x00, (byte) 0x00, (byte) 0x01};
             //outputStream.write(byte_message);
-            /*byte[] byte_message2 = new byte[] {(byte) 0x5, (byte)0x00, (byte)0x00, (byte)0x13, (byte)0x00, (byte)0x00, (byte)0x00};
+            byte[] byte_message2 = new byte[] {(byte) 0x5, (byte)0x00, (byte)0x00, (byte)0x13, (byte)0x00, (byte)0x00, (byte)0x00};
             outputStream.write(byte_message2);
             System.out.println("+++++++++++++++++");
             for (int i = 0; i < 10; i++) {
                 System.out.println(inputStream.read());
             }
-            System.out.println("+++++++++++++++++");*/
+            System.out.println("+++++++++++++++++");
             //System.exit(0);
             //}
+            Intent rssi_intent = new Intent(BluetoothDevice.EXTRA_RSSI);
+            short rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+            System.out.println(rssi);
+            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+            System.out.println(rssi);
+            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+            System.out.println(rssi);
+            rssi = rssi_intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+            System.out.println(rssi);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
+        //unregisterReceiver(mReceiver);
     }
 
     @Override
