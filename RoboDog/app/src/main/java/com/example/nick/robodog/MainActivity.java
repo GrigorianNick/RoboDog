@@ -60,19 +60,6 @@ public class MainActivity extends Activity {
             startActivityForResult(enableBtIntent, 111);
         }
         BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("00:16:53:05:E2:1A");
-        System.out.println("=============");
-        System.out.println(device.getBondState());
-        System.out.println(BluetoothDevice.BOND_BONDED);
-        System.out.println(BluetoothDevice.BOND_NONE);
-        System.out.println(BluetoothDevice.BOND_BONDING);
-        System.out.println("=============");
-        System.out.println(device.getBondState());
-        System.out.println(BluetoothDevice.BOND_BONDED);
-        System.out.println(BluetoothDevice.BOND_NONE);
-        device.createBond();
-        System.out.println(device.getAddress());
-        System.out.println("=============");
-
         ParcelUuid uuid = device.getUuids()[0];
         try {
             BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
