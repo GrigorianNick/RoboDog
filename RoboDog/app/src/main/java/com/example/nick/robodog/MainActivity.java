@@ -27,16 +27,43 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
     }
 
-    BluetoothAdapter mBluetoothAdapter;
+    BluetoothAdapter mBluetoothAdapter = null;
+    BluetoothDevice device = null;
+    OutputStream outputStream = null;
+    BluetoothSocket socket = null;
+    ParcelUuid uuid = null;
+
+    public void sendMessage(short rssi) {
+        String message = String.valueOf(rssi);
+        try {
+            if (socket == null) {
+                uuid = device.getUuids()[0];
+                socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
+                socket.connect();
+            }
+            if (outputStream == null) {
+                outputStream = socket.getOutputStream();
+            }
+            byte[] byte_message = new byte[] {(byte)0x00, (byte)0x00};
+            byte[] payload = new byte[] {(byte)0x00, (byte)0x09, (byte) 0x80, (byte)0x03, (byte) Integer.parseInt(message.substring(1,2)), (byte) Integer.parseInt(message.substring(2)), (byte)0x00};
+            byte_message[0] = (byte)payload.length;
+            outputStream.write(byte_message);
+            outputStream.write(payload, 0, payload.length);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getAddress().equals("00:16:53:05:E2:1A")) {
                     short rssi = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-                    System.out.println(rssi);
+                    System.out.println("RSSI: " + rssi);
+                    sendMessage(rssi);
                     mBluetoothAdapter.cancelDiscovery();
                     mBluetoothAdapter.startDiscovery();
                 }
@@ -59,25 +86,21 @@ public class MainActivity extends Activity {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, 111);
         }
-        BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("00:16:53:05:E2:1A");
-        ParcelUuid uuid = device.getUuids()[0];
-        try {
-            BluetoothSocket socket = device.createRfcommSocketToServiceRecord(uuid.getUuid());
-            socket.connect();
-            OutputStream outputStream = socket.getOutputStream();
-            InputStream inputStream = socket.getInputStream();
-            byte[] byte_message = new byte[] {(byte)0x08, (byte)0x00, (byte)0x80, (byte)0x09, (byte) 0x00, (byte)0x04, (byte) 99, (byte)114, (byte)121, (byte)0x00};
-            outputStream.write(byte_message);
-            mBluetoothAdapter.startDiscovery();
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        device = mBluetoothAdapter.getRemoteDevice("00:16:53:05:E2:1A");
+        uuid = device.getUuids()[0];
+        mBluetoothAdapter.startDiscovery();
     }
 
     @Override
     public void onDestroy() {
+        super.onDestroy(); // Voodoo. Do not touch.
         unregisterReceiver(mReceiver);
+        try {
+            socket.close();
+            outputStream.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     @Override
